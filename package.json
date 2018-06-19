@@ -1,0 +1,27 @@
+{
+  "name": "sbros",
+  "version": "1.0.0",
+  "description": "Mario clone",
+  "main": "index.js",
+  "dependencies": {
+    "phaser": "^3.10.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/twarnicki/sbros.git"
+  },
+  "keywords": [
+    "platformer",
+    "aci"
+  ],
+  "author": "tomasz warnicki",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/twarnicki/sbros/issues"
+  },
+  "homepage": "https://github.com/twarnicki/sbros#readme"
+}
