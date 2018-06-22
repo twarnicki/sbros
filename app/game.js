@@ -19,6 +19,9 @@ var config = {
 var game = new Phaser.Game(config);
 var score = 0;
 var scoreText;
+var map;
+var back_ground;
+var for_ground;
 
 function preload() {
     this.load.image('sky', 'assets/sky.png');
@@ -28,26 +31,39 @@ function preload() {
         { frameWidth: 32, frameHeight: 48 }
     );
     this.load.image('ground', 'assets/platform.png');
-      //this.load.image('ground', 'assets/platform.png');
       //this.load.image('star', 'assets/star.png');
       //this.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+      
+    this.load.image('kenny_platformer_64x64', 'assets/kenny_platformer_64x64.png');
+    this.load.tilemapTiledJSON('map01', 'assets/01map.json');
 }
 
 function create() {
-    this.add.image(400, 300, 'sky');
-    //this.add.image(400, 300, 'coin');
+    this.add.image(400, 300, 'sky').setScale(10);
+
+    map = this.make.tilemap({ key: 'map01' });
+    var tiles = map.addTilesetImage('kenny_platformer_64x64');
+    for_ground = map.createStaticLayer('fg', tiles, 0, 0);
+    back_ground = map.createStaticLayer('bg', tiles, 0, 0);
+    this.physics.world.bounds.width = for_ground.width;
+    this.physics.world.bounds.height = for_ground.height;
+    for_ground.setCollisionByExclusion([-1]);
     
+    
+    /*
     platforms = this.physics.add.staticGroup();
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
-    
+    */
     
     player = this.physics.add.sprite(100, 450, 'dude');
-    
-    //player.setBounce(0.2);
     player.setCollideWorldBounds(true);
+    //player.setBounce(0.2);
+    this.cameras.main.startFollow(player);
+    this.physics.add.collider(for_ground, player);
+    //this.physics.add.collider(player, platforms);
 
     this.anims.create({
         key: 'left',
@@ -70,23 +86,23 @@ function create() {
     });
     
     cursors = this.input.keyboard.createCursorKeys();
-    this.physics.add.collider(player, platforms);
     
     stars = this.physics.add.group({
         key: 'coin',
-        repeat: 11,
-        setXY: { x: 12, y: 0, stepX: 70 }
+        repeat: 50,
+        setXY: { x: 100, y: 0, stepX: 150 }
     });
+    //this.physics.add.collider(stars, platforms);
+    this.physics.add.collider(stars, for_ground);
+
 
     stars.children.iterate(function (child) {
         child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
     });
     
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-    this.physics.add.collider(stars, platforms);
+    scoreText.setScrollFactor(0);
     this.physics.add.overlap(player, stars, collectStar, null, this);
-    
 }
 
 function update() {
@@ -106,7 +122,7 @@ function update() {
         player.anims.play('turn');
     }
 
-    if (cursors.up.isDown && player.body.touching.down)
+    if (cursors.up.isDown && player.body.onFloor())
     {
         player.setVelocityY(-500);
     }
